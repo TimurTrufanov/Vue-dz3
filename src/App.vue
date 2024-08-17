@@ -1,10 +1,20 @@
 <template>
   <v-app class="py-4">
-    <header-component @content-changed="handleContentChange"></header-component>
+    <header-component @content-changed="handleContentChange"/>
     <v-main>
-      <filter-component @filter-changed="handleFilterChange"></filter-component>
-      <anime-cards v-if="currentComponent === 'anime'" :filteredBy="filteredBy"></anime-cards>
-      <manga-cards v-if="currentComponent === 'manga'" :filteredBy="filteredBy"></manga-cards>
+      <v-container>
+        <div class="mb-8">
+          <current-time/>
+          <user-registration/>
+          <toggle-methods/>
+          <dynamic-list/>
+          <animated-component/>
+          <dynamic-table/>
+        </div>
+        <filter-component @filter-changed="handleFilterChange"/>
+        <anime-cards v-if="currentComponent === 'anime'" :filteredBy="filteredBy"/>
+        <manga-cards v-if="currentComponent === 'manga'" :filteredBy="filteredBy"/>
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -13,13 +23,25 @@
 import AnimeCards from '@/components/AnimeCards.vue';
 import MangaCards from "@/components/MangaCards.vue";
 import HeaderComponent from "@/components/layouts/HeaderComponent.vue";
+import CurrentTime from "@/components/CurrentTime.vue";
+import UserRegistration from "@/components/UserRegistration.vue";
+import ToggleMethods from "@/components/ToggleMethods.vue";
+import DynamicList from "@/components/DynamicList.vue";
+import AnimatedComponent from "@/components/AnimatedComponent.vue";
+import DynamicTable from "@/components/DynamicTable.vue";
 
 export default {
   name: 'App',
   components: {
+    DynamicTable,
+    AnimatedComponent,
     AnimeCards,
     MangaCards,
-    HeaderComponent
+    HeaderComponent,
+    CurrentTime,
+    UserRegistration,
+    ToggleMethods,
+    DynamicList,
   },
   data() {
     return {

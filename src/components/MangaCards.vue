@@ -1,28 +1,26 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col
-          v-for="manga in mangaArray"
-          :key="manga.mal_id"
-          cols="12"
-          sm="6"
-          md="4"
-          lg="3"
-      >
-        <v-card>
-          <v-img
-              :src="manga.images.jpg.image_url"
-              height="350px"
-              cover
-          ></v-img>
-          <v-card-title>{{ manga.title }}</v-card-title>
-          <v-card-subtitle>{{ manga.year }}</v-card-subtitle>
-          <v-card-subtitle class="pt-2">score: {{ manga.score }}</v-card-subtitle>
-          <v-card-text>{{ getGenres(manga.genres) }}</v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-row>
+    <v-col
+        v-for="manga in mangaArray"
+        :key="manga.mal_id"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+    >
+      <v-card>
+        <v-img
+            :src="manga.images.jpg.image_url"
+            height="350px"
+            cover
+        ></v-img>
+        <v-card-title>{{ manga.title }}</v-card-title>
+        <v-card-subtitle>{{ manga.year }}</v-card-subtitle>
+        <v-card-subtitle class="pt-2">score: {{ manga.score }}</v-card-subtitle>
+        <v-card-text>{{ getGenres(manga.genres) }}</v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script>
@@ -45,15 +43,14 @@ export default {
     }
   },
   methods: {
-    fetchManga() {
-      axiosInstance.get(`top/manga?filter=${this.filteredBy}&page=${this.currentPage}&limit=${this.limitPerPage}`)
-          .then((response) => {
-            this.mangaArray = response.data.data;
-            console.log(this.mangaArray);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+    async fetchManga() {
+      try {
+        const response = await axiosInstance.get(`top/manga?filter=${this.filteredBy}&page=${this.currentPage}&limit=${this.limitPerPage}`);
+        this.mangaArray = response.data.data;
+        console.log(this.mangaArray);
+      } catch (error) {
+        console.log(error);
+      }
     },
     getGenres(genres) {
       return genres.map(genre => genre.name).join(', ');

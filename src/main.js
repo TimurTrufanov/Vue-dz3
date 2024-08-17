@@ -13,7 +13,10 @@ import FilterComponent from '@/components/FilterComponent.vue'
 // Components
 const vuetify = createVuetify({
     components,
-    directives
+    directives,
+    theme: {
+        defaultTheme: 'dark'
+    }
 })
 
 const app = createApp(App)
