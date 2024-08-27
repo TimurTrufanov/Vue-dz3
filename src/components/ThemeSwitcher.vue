@@ -1,18 +1,36 @@
 <template>
-    <v-btn @click="toggleTheme">Toggle Theme</v-btn>
+  <div class="d-flex align-center theme-switcher">
+    <v-icon :color="isDarkTheme ? 'grey' : 'yellow'" class="mx-2">mdi-weather-sunny</v-icon>
+    <v-switch
+        class="mt-5"
+        v-model="isDarkTheme"
+        inset
+    ></v-switch>
+    <v-icon :color="isDarkTheme ? 'lightblue' : 'grey'" class="mx-2">mdi-weather-night</v-icon>
+  </div>
 </template>
 
 <script>
 export default {
   name: 'ThemeSwitcher',
-  methods: {
-    toggleTheme() {
-      this.$vuetify.theme.global.name = this.$vuetify.theme.global.name === 'dark' ? 'light' : 'dark';
+  data() {
+    return {
+      isDarkTheme: true,
+    };
+  },
+  mounted() {
+    this.isDarkTheme = this.$vuetify.theme.global.name === 'dark';
+  },
+  watch: {
+    isDarkTheme(newValue) {
+      this.$vuetify.theme.global.name = newValue ? 'dark' : 'light';
     },
   },
 };
 </script>
 
 <style scoped>
-
+.theme-switcher{
+  height: 40px;
+}
 </style>

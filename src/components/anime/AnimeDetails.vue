@@ -15,9 +15,6 @@
     <v-list-item v-if="details.studios.length">
       <strong>Studios:</strong> {{ details.studios.map(studio => studio.name).join(', ') }}
     </v-list-item>
-    <v-list-item>
-      <router-link :to="`${$route.fullPath}/characters`">View Characters</router-link>
-    </v-list-item>
   </base-details>
 </template>
 

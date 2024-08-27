@@ -1,6 +1,6 @@
 <template>
   <div class="my-4">
-    <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit">
+    <v-form ref="form" v-model="valid" @submit.prevent="login">
       <v-text-field
           v-model="formData.email"
           :rules="emailRules"
@@ -14,7 +14,10 @@
           label="Password"
           required
           type="password"
+          autocomplete="on"
       ></v-text-field>
+
+      <v-alert v-if="errorMessage" type="error" :text="errorMessage"></v-alert>
 
       <v-btn class="mt-4" :disabled="!valid" color="success" type="submit">
         Submit
@@ -24,6 +27,9 @@
 </template>
 
 <script>
+import {signInWithEmailAndPassword} from "firebase/auth";
+import {auth} from "@/main.js";
+
 export default {
   name: "UserLogin",
   data() {
@@ -41,16 +47,26 @@ export default {
         v => !!v || 'Password is required.',
         v => (v && v.length >= 6) || 'Password must be at least 6 characters long.',
       ],
+      errorMessage: ''
     };
   },
   methods: {
-    handleSubmit() {
-      if (this.$refs.form.validate()) {
-        alert('Form successfully submitted!');
+    async login() {
+      if (await this.$refs.form.validate()) {
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, this.formData.email, this.formData.password);
+          this.$emit('update:userId', userCredential.user.uid);
+          this.$router.push({name: 'main'});
+        } catch (error) {
+          this.errorMessage = error.code
+        }
       }
-      console.log(this.formData);
-      this.$refs.form.reset();
     },
+  },
+  mounted() {
+    if (auth.currentUser) {
+      this.$emit('update:userId', auth.currentUser.uid);
+    }
   }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div class="my-4">
-    <v-form ref="form" v-model="valid" @submit.prevent="handleSubmit">
+    <v-form ref="form" v-model="valid" @submit.prevent="register">
       <v-text-field
           v-model="formData.username"
           :rules="usernameRules"
@@ -29,6 +29,7 @@
           label="Password"
           required
           type="password"
+          autocomplete="on"
       ></v-text-field>
 
       <v-text-field
@@ -37,7 +38,10 @@
           label="Confirm Password"
           required
           type="password"
+          autocomplete="on"
       ></v-text-field>
+
+      <v-alert v-if="errorMessage" type="error" :text="errorMessage"></v-alert>
 
       <v-btn class="mt-4" :disabled="!valid" color="success" type="submit">
         Submit
@@ -47,6 +51,10 @@
 </template>
 
 <script>
+import { auth, db } from "@/main.js";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+
 export default {
   name: "UserRegistration",
   data() {
@@ -79,16 +87,36 @@ export default {
         v => !!v || 'Password confirmation is required.',
         v => v === this.formData.password || 'Passwords do not match.',
       ],
+      errorMessage: ''
     };
   },
   methods: {
-    handleSubmit() {
-      if (this.$refs.form.validate()) {
-        alert('Form successfully submitted!');
+    async register() {
+      if (await this.$refs.form.validate()) {
+        try {
+          const userCredential = await createUserWithEmailAndPassword(auth, this.formData.email, this.formData.password);
+          const userId = userCredential.user.uid;
+
+          await setDoc(doc(db, "users", userId), {
+            username: this.formData.username,
+            email: this.formData.email,
+            age: this.formData.age,
+            isAdmin: false,
+          });
+
+          this.$emit('update:userId', userId);
+          this.$router.push({name: 'main'});
+
+        } catch (error) {
+          this.errorMessage = error.code
+        }
       }
-      console.log(this.formData);
-      this.$refs.form.reset();
-    },
+    }
+  },
+  mounted() {
+    if (auth.currentUser) {
+      this.$emit('update:userId', auth.currentUser.uid);
+    }
   }
 }
 </script>

@@ -12,6 +12,12 @@
 <script>
 export default {
   name: "FilterComponent",
+  props: {
+    mediaType: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       selectedFilter: ''
@@ -19,13 +25,24 @@ export default {
   },
   computed: {
     filterOptions() {
-      return [
-        {label: 'Score', value: ''},
-        {label: 'Currently Airing', value: 'airing'},
-        {label: 'Upcoming', value: 'upcoming'},
-        {label: 'Popularity', value: 'bypopularity'},
-        {label: 'Most favorite', value: 'favorite'},
-      ];
+      if (this.mediaType === 'anime') {
+        return [
+          { label: 'Score', value: '' },
+          { label: 'Currently Airing', value: 'airing' },
+          { label: 'Upcoming', value: 'upcoming' },
+          { label: 'Popularity', value: 'bypopularity' },
+          { label: 'Most favorite', value: 'favorite' }
+        ];
+      } else if (this.mediaType === 'manga') {
+        return [
+          { label: 'Score', value: '' },
+          { label: 'Publishing', value: 'publishing' },
+          { label: 'Upcoming', value: 'upcoming' },
+          { label: 'Popularity', value: 'bypopularity' },
+          { label: 'Most favorite', value: 'favorite' }
+        ];
+      }
+      return [];
     }
   },
   watch: {

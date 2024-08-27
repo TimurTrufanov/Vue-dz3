@@ -1,5 +1,5 @@
 <template>
-  <base-cards mediaType="anime" />
+  <base-cards :media-type="mediaType" />
 </template>
 
 <script>
@@ -10,8 +10,10 @@ export default {
   components: {
     BaseCards
   },
+  data() {
+    return{
+      mediaType: 'anime',
+    }
+  }
 };
 </script>
-
-<style scoped>
-</style>
