@@ -7,7 +7,9 @@
             <div>
               <v-card-text class="hover-text">{{ item.synopsis }}</v-card-text>
               <v-card-actions>
-                <v-btn :to="detailsLink" class="w-100" variant="plain" size="large">Check details</v-btn>
+                <v-btn
+                    :to="{ name: `${mediaType}-details`, params: { id: item.mal_id }}"
+                    class="w-100" variant="plain" size="large">Check details</v-btn>
               </v-card-actions>
             </div>
           </div>
@@ -15,12 +17,14 @@
       </v-img>
       <v-card-title>{{ item.title }}</v-card-title>
       <v-card-subtitle>{{ item.year }}</v-card-subtitle>
-      <v-card-subtitle v-if="showScore" class="pt-2">
+      <v-card-subtitle v-if="item.score" class="pt-2">
         Score: {{ item.score }}
       </v-card-subtitle>
       <v-card-text>{{ item.genres.map(genre => genre.name).join(", ") }}</v-card-text>
       <v-card-actions>
-        <v-btn :to="detailsLink" class="w-100" size="large">Check details</v-btn>
+        <v-btn
+            :to="{ name: `${mediaType}-details`, params: { id: item.mal_id }}"
+            class="w-100" size="large">Check details</v-btn>
       </v-card-actions>
     </v-card>
   </v-hover>
@@ -34,18 +38,9 @@ export default {
       type: Object,
       required: true,
     },
-    showScore: {
-      type: Boolean,
-      required: true,
-    },
     mediaType: {
       type: String,
       required: true
-    }
-  },
-  computed: {
-    detailsLink() {
-      return `/${this.mediaType}/${this.item.mal_id}`;
     }
   },
 }

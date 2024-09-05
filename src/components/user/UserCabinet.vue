@@ -1,64 +1,46 @@
 <template>
   <div>
-    <div class="progress-container" v-if="isLoading">
-      <v-progress-circular indeterminate :size="128" :width="12"></v-progress-circular>
+    <h2 class="text-center text-xl-h3">User cabinet</h2>
+    <div class="my-4 d-flex justify-space-between align-center">
+      <p class="text-xl-h5 d-flex align-end">
+        <router-link :to="{name: 'user-statuses', params: {id: userId}}">
+          <v-avatar class="mr-4">
+            <v-img :src="profilePictureUrl" alt="User picture"></v-img>
+          </v-avatar>
+        </router-link>
+        {{ username }}
+      </p>
+      <div class="d-flex ga-5">
+        <v-btn exact :to="{ name: 'user-statuses', params: { id: userId } }">View user statuses</v-btn>
+        <v-btn :to="{ name: 'change-info', params: { id: userId } }">Change user info</v-btn>
+        <v-btn :to="{ name: 'change-password', params: { id: userId } }">Change password</v-btn>
+      </div>
     </div>
-    <div v-else>
-      <h2>User cabinet</h2>
-      <p>User ID: {{ id }}</p>
-    </div>
+    <router-view/>
   </div>
 </template>
 
 <script>
-import {auth} from "@/main.js";
-import {onAuthStateChanged} from "firebase/auth";
+import {mapState} from 'pinia';
+import {useUserStore} from "@/store/userStore";
+import UserStatuses from "@/components/user/UserStatuses.vue";
 
 export default {
   name: "UserCabinet",
-  props: {
-    id: {
-      type: String,
-      required: true
-    }
-  },
-  data() {
-    return {
-      isLoading: true,
-    };
+  components: {
+    UserStatuses,
   },
   computed: {
-    currentUserId() {
-      return this.$route.params.id;
-    }
+    ...mapState(useUserStore, ['userId', 'username', 'profilePictureUrl']),
   },
   created() {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.checkAccess(user.uid);
-      } else {
-        this.redirectToNotFound();
-      }
-    });
-  },
-  methods: {
-    checkAccess(userId) {
-      if (userId !== this.currentUserId) {
-        this.redirectToNotFound();
-      } else {
-        this.isLoading = false;
-      }
-    },
-    redirectToNotFound() {
+    if (!this.userId || this.userId !== this.$route.params.id) {
       this.$router.push({name: 'not-found'});
     }
-  }
+  },
 }
 </script>
 
 <style scoped>
-.progress-container {
-  display: flex;
-  justify-content: center;
-}
+
 </style>

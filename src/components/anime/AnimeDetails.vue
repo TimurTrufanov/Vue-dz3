@@ -12,7 +12,7 @@
     <v-list-item v-if="details.broadcast">
       <strong>Broadcast:</strong> {{ details.broadcast.string }}
     </v-list-item>
-    <v-list-item v-if="details.studios.length">
+    <v-list-item v-if="details.studios">
       <strong>Studios:</strong> {{ details.studios.map(studio => studio.name).join(', ') }}
     </v-list-item>
   </base-details>

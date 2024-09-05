@@ -9,10 +9,10 @@
     <v-list-item v-if="details.published">
       <strong>Published:</strong> {{ details.published.string }}
     </v-list-item>
-    <v-list-item v-if="details.authors.length">
+    <v-list-item v-if="details.authors">
       <strong>Authors:</strong> {{ details.authors.map(author => author.name).join(', ') }}
     </v-list-item>
-    <v-list-item v-if="details.serializations.length">
+    <v-list-item v-if="details.serializations">
       <strong>Serializations:</strong> {{ details.serializations.map(serial => serial.name).join(', ') }}
     </v-list-item>
   </base-details>

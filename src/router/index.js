@@ -2,13 +2,11 @@ import {createWebHistory, createRouter} from 'vue-router'
 import { auth, db } from "@/main.js";
 import { doc, getDoc } from "firebase/firestore";
 
-import AnimeCards from "@/components/anime/AnimeCards.vue";
-import MangaCards from "@/components/manga/MangaCards.vue";
 import MainPage from "@/components/MainPage.vue";
 import UserRegistration from "@/components/user/UserRegistration.vue";
 import UserLogin from "@/components/user/UserLogin.vue";
 import UserCabinet from "@/components/user/UserCabinet.vue";
-import AdminPage from "@/components/AdminPage.vue";
+import AdminPage from "@/components/admin/AdminPage.vue";
 import AbstractExamples from "@/components/AbstractExamples.vue";
 
 const routes = [
@@ -20,12 +18,26 @@ const routes = [
     {
         path: '/anime',
         name: 'anime',
-        component: AnimeCards,
+        component: () => import("@/components/BaseCards.vue"),
+        props: { mediaType: 'anime' },
     },
     {
         path: '/manga',
         name: 'manga',
-        component: MangaCards,
+        component: () => import("@/components/BaseCards.vue"),
+        props: { mediaType: 'manga' },
+    },
+    {
+        path: '/anime/now',
+        name: 'anime-now',
+        component: () => import("@/components/anime/AnimeCards.vue"),
+        props: { season: 'now' },
+    },
+    {
+        path: '/anime/upcoming',
+        name: 'anime-upcoming',
+        component: () => import("@/components/anime/AnimeCards.vue"),
+        props: { season: 'upcoming' },
     },
     {
         path: '/anime/:id',
@@ -35,7 +47,8 @@ const routes = [
             {
                 path: 'characters',
                 name: 'anime-characters',
-                component: () => import("@/components/anime/AnimeCharacters.vue"),
+                component: () => import("@/components/BaseCharacters.vue"),
+                props: { mediaType: 'anime' },
             },
         ],
     },
@@ -47,7 +60,8 @@ const routes = [
             {
                 path: 'characters',
                 name: 'manga-characters',
-                component: () => import("@/components/manga/MangaCharacters.vue"),
+                component: () => import("@/components/BaseCharacters.vue"),
+                props: { mediaType: 'manga' },
             },
         ],
     },
@@ -67,12 +81,29 @@ const routes = [
         component: UserCabinet,
         props: true,
         meta: { requiresAuth: true },
+        children: [
+            {
+                path: '',
+                name: 'user-statuses',
+                component: () => import("@/components/user/UserStatuses.vue"),
+            },
+            {
+                path: 'change-info',
+                name: 'change-info',
+                component: () => import("@/components/user/UserChangeInfo.vue"),
+            },
+            {
+                path: 'change-password',
+                name: 'change-password',
+                component: () => import("@/components/user/UserChangePassword.vue"),
+            },
+        ],
     },
     {
         path: '/admin',
         name: 'admin',
         component: AdminPage,
-        meta: { requiresAdmin: true },
+        meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
         path: '/abstract',

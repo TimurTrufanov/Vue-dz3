@@ -1,13 +1,12 @@
 <template>
   <div class="my-4">
-    <v-form ref="form" v-model="valid" @submit.prevent="login">
+    <v-form ref="form" v-model="valid" @submit.prevent="handleLogin">
       <v-text-field
           v-model="formData.email"
           :rules="emailRules"
           label="Email"
           required
       ></v-text-field>
-
       <v-text-field
           v-model="formData.password"
           :rules="passwordRules"
@@ -16,9 +15,11 @@
           type="password"
           autocomplete="on"
       ></v-text-field>
-
-      <v-alert v-if="errorMessage" type="error" :text="errorMessage"></v-alert>
-
+      <v-alert
+          v-if="errorMessage"
+          type="error"
+          :text="errorMessage"
+      ></v-alert>
       <v-btn class="mt-4" :disabled="!valid" color="success" type="submit">
         Submit
       </v-btn>
@@ -27,50 +28,41 @@
 </template>
 
 <script>
-import {signInWithEmailAndPassword} from "firebase/auth";
-import {auth} from "@/main.js";
+import { mapState, mapActions } from 'pinia';
+import { useUserStore } from '@/store/userStore';
+import validationMixin from '@/mixins/validationMixin';
 
 export default {
-  name: "UserLogin",
+  name: 'UserLogin',
+  mixins: [validationMixin],
   data() {
     return {
-      valid: false,
       formData: {
         email: '',
         password: '',
       },
-      emailRules: [
-        v => !!v || 'Email is required.',
-        v => /.+@.+\..+/.test(v) || 'Email must be valid.',
-      ],
-      passwordRules: [
-        v => !!v || 'Password is required.',
-        v => (v && v.length >= 6) || 'Password must be at least 6 characters long.',
-      ],
-      errorMessage: ''
     };
   },
+  computed: {
+    ...mapState(useUserStore, ['errorMessage']),
+  },
   methods: {
-    async login() {
+    ...mapActions(useUserStore, ['login']),
+    async handleLogin() {
       if (await this.$refs.form.validate()) {
-        try {
-          const userCredential = await signInWithEmailAndPassword(auth, this.formData.email, this.formData.password);
-          this.$emit('update:userId', userCredential.user.uid);
-          this.$router.push({name: 'main'});
-        } catch (error) {
-          this.errorMessage = error.code
+        const success = await this.login(this.formData.email, this.formData.password);
+        if (success) {
+          this.$router.push({ name: 'main' });
         }
       }
     },
   },
   mounted() {
-    if (auth.currentUser) {
-      this.$emit('update:userId', auth.currentUser.uid);
+    if (this.userId) {
+      this.$emit('update:userId', this.userId);
     }
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

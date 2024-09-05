@@ -10,6 +10,10 @@
 </template>
 
 <script>
+import {animeFilters, mangaFilters} from "@/constants/filters.js";
+import {mapState} from "pinia";
+import {useMediaStore} from "@/store/mediaStore.js";
+
 export default {
   name: "FilterComponent",
   props: {
@@ -18,43 +22,25 @@ export default {
       required: true
     }
   },
-  data() {
-    return {
-      selectedFilter: ''
-    }
-  },
   computed: {
+    ...mapState(useMediaStore, ['filteredBy']),
+    selectedFilter: {
+      get() {
+        return this.filteredBy;
+      },
+      set(value) {
+        this.updateFilter(value);
+      },
+    },
     filterOptions() {
-      if (this.mediaType === 'anime') {
-        return [
-          { label: 'Score', value: '' },
-          { label: 'Currently Airing', value: 'airing' },
-          { label: 'Upcoming', value: 'upcoming' },
-          { label: 'Popularity', value: 'bypopularity' },
-          { label: 'Most favorite', value: 'favorite' }
-        ];
-      } else if (this.mediaType === 'manga') {
-        return [
-          { label: 'Score', value: '' },
-          { label: 'Publishing', value: 'publishing' },
-          { label: 'Upcoming', value: 'upcoming' },
-          { label: 'Popularity', value: 'bypopularity' },
-          { label: 'Most favorite', value: 'favorite' }
-        ];
-      }
-      return [];
-    }
-  },
-  watch: {
-    selectedFilter(newFilter) {
-      this.updateFilter(newFilter);
+      return this.mediaType === 'anime' ? animeFilters : mangaFilters;
     }
   },
   methods: {
     updateFilter(selectedFilter) {
       this.$emit('filter-changed', selectedFilter);
-    }
-  }
+    },
+  },
 }
 </script>
 

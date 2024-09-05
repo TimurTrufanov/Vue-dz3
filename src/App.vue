@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <header-component :userId="userId" @update:userId="userId = $event"/>
+    <header-component/>
     <v-main>
       <v-container class="container">
         <router-view/>
@@ -11,24 +11,20 @@
 
 <script>
 import HeaderComponent from "@/layouts/HeaderComponent.vue";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "@/main.js";
+import { mapActions } from 'pinia';
+import { useUserStore } from "@/store/userStore";
 
 export default {
   name: 'App',
   components: {
     HeaderComponent,
   },
-  data() {
-    return {
-      userId: '',
-    };
+  methods: {
+    ...mapActions(useUserStore, ['initAuth']),
   },
-  created() {
-    onAuthStateChanged(auth, (user) => {
-      this.userId = user ? user.uid : '';
-    });
-  }
+  async created() {
+    await this.initAuth();
+  },
 }
 </script>
 

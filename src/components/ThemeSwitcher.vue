@@ -19,18 +19,24 @@ export default {
     };
   },
   mounted() {
-    this.isDarkTheme = this.$vuetify.theme.global.name === 'dark';
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      this.isDarkTheme = savedTheme === 'dark';
+    } else {
+      this.isDarkTheme = this.$vuetify.theme.global.name === 'dark';
+    }
   },
   watch: {
     isDarkTheme(newValue) {
       this.$vuetify.theme.global.name = newValue ? 'dark' : 'light';
+      localStorage.setItem('theme', newValue ? 'dark' : 'light');
     },
   },
 };
 </script>
 
 <style scoped>
-.theme-switcher{
+.theme-switcher {
   height: 40px;
 }
 </style>

@@ -46,7 +46,6 @@ export default {
         const id = this.$route.params.id;
         const response = await axiosInstance.get(`${this.mediaType}/${id}/characters`);
         this.characters = response.data.data;
-        console.log(this.characters);
       } catch (error) {
         console.log(error);
       }

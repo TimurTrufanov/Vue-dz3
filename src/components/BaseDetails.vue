@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="progress-container" v-if="!details">
+    <div class="d-flex justify-center" v-if="!details">
       <v-progress-circular indeterminate :size="128" :width="12"></v-progress-circular>
     </div>
     <div v-else>
@@ -8,6 +8,21 @@
         <v-row>
           <v-col cols="12" md="4">
             <v-img :src="details.images.jpg.image_url" :alt="details.title"/>
+            <div class="d-flex flex-column align-center justify-center mt-4">
+              <v-rating
+                  hover
+                  half-increments
+                  :length="ratingLength"
+                  density="compact"
+                  color="primary"
+                  active-color="warning"
+                  :model-value="averageRating"
+                  :readonly="!userId"
+                  @update:model-value="handleRatingUpdate"
+              />
+              <p v-if="ratingCount">({{ ratingCount }} ratings)</p>
+            </div>
+            <media-status :mediaType="mediaType" :mediaId="$route.params.id" :mediaTitle="details.title"/>
           </v-col>
           <v-col cols="12" md="8">
             <h2>{{ details.title }}</h2>
@@ -18,13 +33,12 @@
             <p v-if="details.title_synonyms.length">
               <strong>Synonyms:</strong> {{ details.title_synonyms.join(', ') }}
             </p>
-            <v-divider class="my-4"></v-divider>
-            <p class="font-italic">{{ details.synopsis }}</p>
+            <div v-if="details.synopsis">
+              <v-divider class="my-4"></v-divider>
+              <p  class="font-italic">{{ details.synopsis }}</p>
+            </div>
             <v-divider class="my-4"></v-divider>
             <v-list>
-              <v-list-item>
-                <strong>ID:</strong> {{ $route.params.id }}
-              </v-list-item>
               <v-list-item v-if="details.score">
                 <strong>Score:</strong> {{ details.score }}
               </v-list-item>
@@ -63,53 +77,91 @@
             <iframe :src="details.trailer.embed_url" class="trailer" width="100%" allowfullscreen></iframe>
           </v-col>
         </v-row>
-        <router-view />
+        <v-row>
+          <v-col cols="12">
+            <v-divider class="my-4"></v-divider>
+            <comments-section :mediaType="mediaType" :mediaId="$route.params.id"/>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <router-view/>
+          </v-col>
+        </v-row>
       </v-container>
     </div>
   </div>
 </template>
 
 <script>
-import axiosInstance from "@/services/axios.js";
+import {useMediaStore} from "@/store/mediaStore.js";
+import MediaStatus from "@/components/MediaStatus.vue";
+import CommentsSection from "@/components/CommentsSection.vue";
+import {mapState, mapActions} from "pinia";
+import {useUserStore} from '@/store/userStore';
 
 export default {
   name: "BaseDetails",
-  props: {
-    mediaType: {
-      type: String,
-      required: true
-    }
+  components: {
+    MediaStatus,
+    CommentsSection,
   },
   data() {
     return {
-      details: null
+      ratingLength: 10,
     };
   },
-  methods: {
-    async fetchDetails() {
-      try {
-        const id = this.$route.params.id;
-        const response = await axiosInstance.get(`${this.mediaType}/${id}`);
-        this.details = response.data.data;
-      } catch (error) {
-        if (error.response.status === 404) {
-          this.$router.push({ name: 'not-found' });
-        }
-      }
+  props: {
+    mediaType: {
+      type: String,
+      required: true,
     },
   },
-  created() {
-    this.fetchDetails();
+  computed: {
+    ...mapState(useMediaStore, {
+      mediaArray: 'mediaArray',
+      currentMedia: 'currentMedia',
+      averageRating: 'averageRating',
+      ratingCount: 'ratingCount',
+      userRating: 'userRating',
+      details() {
+        return this.currentMedia || this.mediaArray.find(media => media.mal_id === +this.$route.params.id);
+      }
+    }),
+    ...mapState(useUserStore, ['userId']),
   },
+  methods: {
+    ...mapActions(useMediaStore, ['fetchSingleMedia', 'scrollToTop', 'resetSingleMedia', 'fetchMediaRatings', 'updateMediaRating']),
+
+    handleRatingUpdate(newRating) {
+      this.updateMediaRating(this.$route.params.id, newRating);
+    },
+  },
+  watch: {
+    '$route.params.id': {
+      async handler(newId) {
+        this.scrollToTop();
+        this.resetSingleMedia();
+
+        if (!this.details) {
+          try {
+            await this.fetchSingleMedia(this.mediaType, +newId);
+          } catch (error) {
+            if (error.response) {
+              this.$router.push({name: 'not-found'});
+            }
+          }
+        }
+
+        await this.fetchMediaRatings(newId);
+      },
+      immediate: true,
+    }
+  }
 };
 </script>
 
 <style scoped>
-.progress-container{
-  display: flex;
-  justify-content: center;
-}
-
 .trailer {
   aspect-ratio: 16 / 9;
   border: none;

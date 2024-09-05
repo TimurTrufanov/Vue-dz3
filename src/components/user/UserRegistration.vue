@@ -1,20 +1,18 @@
 <template>
   <div class="my-4">
-    <v-form ref="form" v-model="valid" @submit.prevent="register">
+    <v-form ref="form" v-model="valid" @submit.prevent="handleRegister">
       <v-text-field
           v-model="formData.username"
           :rules="usernameRules"
           label="Username"
           required
       ></v-text-field>
-
       <v-text-field
           v-model="formData.email"
           :rules="emailRules"
           label="Email"
           required
       ></v-text-field>
-
       <v-text-field
           v-model="formData.age"
           :rules="ageRules"
@@ -22,7 +20,6 @@
           required
           type="number"
       ></v-text-field>
-
       <v-text-field
           v-model="formData.password"
           :rules="passwordRules"
@@ -31,7 +28,6 @@
           type="password"
           autocomplete="on"
       ></v-text-field>
-
       <v-text-field
           v-model="formData.passwordConfirmation"
           :rules="passwordConfirmationRules"
@@ -40,9 +36,11 @@
           type="password"
           autocomplete="on"
       ></v-text-field>
-
-      <v-alert v-if="errorMessage" type="error" :text="errorMessage"></v-alert>
-
+      <v-alert
+          v-if="errorMessage"
+          type="error"
+          :text="errorMessage"
+      ></v-alert>
       <v-btn class="mt-4" :disabled="!valid" color="success" type="submit">
         Submit
       </v-btn>
@@ -51,15 +49,15 @@
 </template>
 
 <script>
-import { auth, db } from "@/main.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { mapState, mapActions } from 'pinia';
+import { useUserStore } from '@/store/userStore';
+import validationMixin from '@/mixins/validationMixin';
 
 export default {
-  name: "UserRegistration",
+  name: 'UserRegistration',
+  mixins: [validationMixin],
   data() {
     return {
-      valid: false,
       formData: {
         username: '',
         email: '',
@@ -67,60 +65,33 @@ export default {
         password: '',
         passwordConfirmation: '',
       },
-      usernameRules: [
-        v => !!v || 'Username is required.',
-        v => (v && v.length >= 6) || 'Username must be at least 6 characters long.',
-      ],
-      emailRules: [
-        v => !!v || 'Email is required.',
-        v => /.+@.+\..+/.test(v) || 'Email must be valid.',
-      ],
-      ageRules: [
-        v => !!v || 'Age is required.',
-        v => (v && v > 0) || 'Age must be a positive number.'
-      ],
-      passwordRules: [
-        v => !!v || 'Password is required.',
-        v => (v && v.length >= 6) || 'Password must be at least 6 characters long.',
-      ],
-      passwordConfirmationRules: [
-        v => !!v || 'Password confirmation is required.',
-        v => v === this.formData.password || 'Passwords do not match.',
-      ],
-      errorMessage: ''
     };
   },
+  computed: {
+    ...mapState(useUserStore, ['errorMessage']),
+  },
   methods: {
-    async register() {
+    ...mapActions(useUserStore, ['register']),
+    async handleRegister() {
       if (await this.$refs.form.validate()) {
-        try {
-          const userCredential = await createUserWithEmailAndPassword(auth, this.formData.email, this.formData.password);
-          const userId = userCredential.user.uid;
-
-          await setDoc(doc(db, "users", userId), {
-            username: this.formData.username,
-            email: this.formData.email,
-            age: this.formData.age,
-            isAdmin: false,
-          });
-
-          this.$emit('update:userId', userId);
-          this.$router.push({name: 'main'});
-
-        } catch (error) {
-          this.errorMessage = error.code
+        const success = await this.register({
+          email: this.formData.email,
+          password: this.formData.password,
+          username: this.formData.username,
+          age: this.formData.age,
+        });
+        if (success) {
+          this.$router.push({ name: 'main' });
         }
       }
-    }
+    },
   },
   mounted() {
-    if (auth.currentUser) {
-      this.$emit('update:userId', auth.currentUser.uid);
+    if (this.userId) {
+      this.$emit('update:userId', this.userId);
     }
   }
-}
+};
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
