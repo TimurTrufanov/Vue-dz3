@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import BaseDetails from '@/components/BaseDetails.vue';
+import BaseDetails from '@/components/base/BaseDetails.vue';
 
 export default {
   name: "MangaDetails",

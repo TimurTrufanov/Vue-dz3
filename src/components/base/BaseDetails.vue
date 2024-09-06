@@ -7,7 +7,7 @@
       <v-container>
         <v-row>
           <v-col cols="12" md="4">
-            <v-img :src="details.images.jpg.image_url" :alt="details.title"/>
+            <v-img v-tooltip="`${details.title}`" :src="details.images.jpg.image_url" :alt="details.title"/>
             <div class="d-flex flex-column align-center justify-center mt-4">
               <v-rating
                   hover
@@ -98,7 +98,7 @@ import {useMediaStore} from "@/store/mediaStore.js";
 import MediaStatus from "@/components/MediaStatus.vue";
 import CommentsSection from "@/components/CommentsSection.vue";
 import {mapState, mapActions} from "pinia";
-import {useUserStore} from '@/store/userStore';
+import {useUserStore} from '@/store/userStore.js';
 
 export default {
   name: "BaseDetails",

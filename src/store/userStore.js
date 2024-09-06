@@ -159,18 +159,16 @@ export const useUserStore = defineStore('userStore', {
                 return false;
             }
         },
-        async getUserProfilePicture(userId) {
-            const userDoc = doc(db, "users", userId);
-            const docSnapshot = await getDoc(userDoc);
+        async getUserProfileInfo(userId) {
+            const docSnapshot = await getDoc(doc(db, "users", userId));
+            const userData = docSnapshot.data();
+            const profilePictureRef = ref(storage, userData.profilePicturePath);
+            const profilePictureUrl = await getDownloadURL(profilePictureRef);
 
-            if (docSnapshot.exists()) {
-                const userData = docSnapshot.data();
-                const profilePicPath = userData.profilePicturePath || this.profilePictureUrl;
-                const profilePicRef = ref(storage, profilePicPath);
-                return await getDownloadURL(profilePicRef);
-            }
-
-            return this.profilePictureUrl;
+            return {
+                username: userData.username,
+                profilePictureUrl
+            };
         }
     },
 });

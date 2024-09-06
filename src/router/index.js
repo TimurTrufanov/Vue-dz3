@@ -18,13 +18,13 @@ const routes = [
     {
         path: '/anime',
         name: 'anime',
-        component: () => import("@/components/BaseCards.vue"),
+        component: () => import("@/components/base/BaseCards.vue"),
         props: { mediaType: 'anime' },
     },
     {
         path: '/manga',
         name: 'manga',
-        component: () => import("@/components/BaseCards.vue"),
+        component: () => import("@/components/base/BaseCards.vue"),
         props: { mediaType: 'manga' },
     },
     {
@@ -47,7 +47,7 @@ const routes = [
             {
                 path: 'characters',
                 name: 'anime-characters',
-                component: () => import("@/components/BaseCharacters.vue"),
+                component: () => import("@/components/base/BaseCharacters.vue"),
                 props: { mediaType: 'anime' },
             },
         ],
@@ -60,7 +60,7 @@ const routes = [
             {
                 path: 'characters',
                 name: 'manga-characters',
-                component: () => import("@/components/BaseCharacters.vue"),
+                component: () => import("@/components/base/BaseCharacters.vue"),
                 props: { mediaType: 'manga' },
             },
         ],
