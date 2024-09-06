@@ -7,9 +7,6 @@
         <v-btn :to="{name: 'manga'}">Manga</v-btn>
       </v-col>
       <v-col cols="auto">
-        <v-btn :to="{name: 'abstract'}">Abstract examples</v-btn>
-      </v-col>
-      <v-col cols="auto">
         <theme-switcher/>
       </v-col>
       <v-col v-if="userId" cols="auto">

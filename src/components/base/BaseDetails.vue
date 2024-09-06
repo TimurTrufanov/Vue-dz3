@@ -106,6 +106,47 @@ export default {
     MediaStatus,
     CommentsSection,
   },
+  directives: {
+    tooltip: {
+      mounted(el, binding) {
+        const tooltip = document.createElement('div');
+
+        tooltip.style.position = 'absolute';
+        tooltip.style.backgroundColor = '#333';
+        tooltip.style.color = '#fff';
+        tooltip.style.padding = '5px 10px';
+        tooltip.style.borderRadius = '4px';
+        tooltip.style.whiteSpace = 'nowrap';
+        tooltip.style.display = 'none';
+        tooltip.textContent = binding.value;
+
+        document.body.appendChild(tooltip);
+
+        el.addEventListener('mouseenter', () => {
+          tooltip.style.display = 'block';
+        });
+
+        el.addEventListener('mousemove', (event) => {
+          const mouseX = event.pageX;
+          const mouseY = event.pageY;
+
+          tooltip.style.left = `${mouseX + 15}px`;
+          tooltip.style.top = `${mouseY - tooltip.offsetHeight - 10}px`;
+        });
+
+        el.addEventListener('mouseleave', () => {
+          tooltip.style.display = 'none';
+        });
+
+        el.tooltip = tooltip;
+      },
+      unmounted(el) {
+        if (el.tooltip) {
+          document.body.removeChild(el.tooltip);
+        }
+      }
+    }
+  },
   data() {
     return {
       ratingLength: 10,

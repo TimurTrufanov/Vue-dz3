@@ -7,7 +7,6 @@ import UserRegistration from "@/components/user/UserRegistration.vue";
 import UserLogin from "@/components/user/UserLogin.vue";
 import UserCabinet from "@/components/user/UserCabinet.vue";
 import AdminPage from "@/components/admin/AdminPage.vue";
-import AbstractExamples from "@/components/AbstractExamples.vue";
 
 const routes = [
     {
@@ -104,11 +103,6 @@ const routes = [
         name: 'admin',
         component: AdminPage,
         meta: { requiresAuth: true, requiresAdmin: true },
-    },
-    {
-        path: '/abstract',
-        name: 'abstract',
-        component: AbstractExamples,
     },
     {
         path: '/:pathMatch(.*)*',

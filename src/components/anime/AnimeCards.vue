@@ -30,7 +30,6 @@
 import { useMediaStore } from "@/store/mediaStore.js";
 import { mapState, mapActions } from "pinia";
 import CardInfo from "@/components/CardInfo.vue";
-import {animeFilters, mangaFilters} from "@/constants/filters.js";
 
 export default {
   name: "AnimeCards",
